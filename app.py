@@ -108,15 +108,17 @@ else:
     year_range = None
 
 # Lọc theo thể loại
-if 'Primary_Genre' in df.columns:
-    genres = ['Tất cả'] + sorted(df['Primary_Genre'].unique().tolist())
+genre_col = 'Primary_Genre' if 'Primary_Genre' in df.columns else 'genre' if 'genre' in df.columns else None
+if genre_col:
+    genres = ['Tất cả'] + sorted(df[genre_col].dropna().unique().tolist())
     selected_genre = st.sidebar.selectbox("🎭 Chọn thể loại", genres)
 else:
     selected_genre = 'Tất cả'
 
 # Lọc theo quốc gia
-if 'Primary_Country' in df.columns:
-    countries = ['Tất cả'] + sorted(df['Primary_Country'].unique().tolist())
+country_col = 'Primary_Country' if 'Primary_Country' in df.columns else 'Country' if 'Country' in df.columns else None
+if country_col:
+    countries = ['Tất cả'] + sorted(df[country_col].dropna().unique().tolist())
     selected_country = st.sidebar.selectbox("🌍 Chọn quốc gia", countries)
 else:
     selected_country = 'Tất cả'
@@ -134,10 +136,10 @@ else:
 df_filtered = df.copy()
 if year_range:
     df_filtered = df_filtered[(df_filtered['Year'] >= year_range[0]) & (df_filtered['Year'] <= year_range[1])]
-if selected_genre != 'Tất cả':
-    df_filtered = df_filtered[df_filtered['Primary_Genre'] == selected_genre]
-if selected_country != 'Tất cả':
-    df_filtered = df_filtered[df_filtered['Primary_Country'] == selected_country]
+if selected_genre != 'Tất cả' and genre_col:
+    df_filtered = df_filtered[df_filtered[genre_col] == selected_genre]
+if selected_country != 'Tất cả' and country_col:
+    df_filtered = df_filtered[df_filtered[country_col] == selected_country]
 if rating_min > 0:
     df_filtered = df_filtered[df_filtered['Rating'] >= rating_min]
 
@@ -194,15 +196,15 @@ with tabs[0]:
             st.metric("📅 Năm mới nhất", f"{int(df['Year'].max())}")
         if 'Rating' in df.columns:
             st.metric("⭐ Rating TB", f"{df['Rating'].mean():.2f}")
-        if 'Primary_Genre' in df.columns:
-            st.metric("🎭 Số thể loại", f"{df['Primary_Genre'].nunique()}")
+        if genre_col and genre_col in df.columns:
+            st.metric("🎭 Số thể loại", f"{df[genre_col].nunique()}")
 
     # Biểu đồ tổng quan
     st.markdown("---")
     st.subheader("📊 Phân Bố Thể Loại")
     
-    if 'Primary_Genre' in df_filtered.columns:
-        genre_counts = df_filtered['Primary_Genre'].value_counts().head(10)
+    if genre_col and genre_col in df_filtered.columns:
+        genre_counts = df_filtered[genre_col].value_counts().head(10)
         fig = px.bar(
             x=genre_counts.values,
             y=genre_counts.index,
@@ -263,16 +265,16 @@ with tabs[1]:
             )
             st.plotly_chart(fig, use_container_width=True)
     
-    if 'Primary_Genre' in df_filtered.columns and 'Runtime' in df_filtered.columns:
+    if genre_col and genre_col in df_filtered.columns and 'Runtime' in df_filtered.columns:
         st.subheader("🎻 Violin Plot: Runtime Theo Thể Loại")
-        top_genres = df_filtered['Primary_Genre'].value_counts().head(6).index
-        df_top_genres = df_filtered[df_filtered['Primary_Genre'].isin(top_genres)]
+        top_genres = df_filtered[genre_col].value_counts().head(6).index
+        df_top_genres = df_filtered[df_filtered[genre_col].isin(top_genres)]
         
         fig = px.violin(
             df_top_genres,
-            x='Primary_Genre',
+            x=genre_col,
             y='Runtime',
-            color='Primary_Genre',
+            color=genre_col,
             title='Phân phối Runtime theo thể loại',
             box=True,
             points="outliers"
@@ -341,7 +343,7 @@ with tabs[3]:
             df_filtered.sample(min(200, len(df_filtered))),
             x='Runtime',
             y='Rating',
-            color='Primary_Genre' if 'Primary_Genre' in df_filtered.columns else None,
+            color=genre_col if genre_col and genre_col in df_filtered.columns else None,
             trendline="ols",
             title='Mối quan hệ giữa thời lượng và rating (với đường hồi quy)',
             labels={'Runtime': 'Thời lượng (phút)', 'Rating': 'IMDb Rating'},
@@ -366,9 +368,9 @@ with tabs[3]:
         fig.update_layout(height=500)
         st.plotly_chart(fig, use_container_width=True)
     
-    if 'Primary_Genre' in df_filtered.columns:
+    if genre_col and genre_col in df_filtered.columns:
         st.subheader("🌳 Treemap: Phân Bố Thể Loại")
-        genre_counts = df_filtered['Primary_Genre'].value_counts().reset_index()
+        genre_counts = df_filtered[genre_col].value_counts().reset_index()
         genre_counts.columns = ['Genre', 'Count']
         
         fig = px.treemap(
@@ -390,14 +392,19 @@ with tabs[4]:
     if 'Rating' in df_filtered.columns:
         st.subheader("⭐ Top 20 Phim Rating Cao Nhất")
         
-        top_rated = df_filtered.nlargest(20, 'Rating')[['Title', 'Year', 'Rating', 'Primary_Genre']].copy()
+        # Chọn cột để hiển thị
+        cols_to_show = ['Title', 'Year', 'Rating']
+        if genre_col and genre_col in df_filtered.columns:
+            cols_to_show.append(genre_col)
+        
+        top_rated = df_filtered.nlargest(20, 'Rating')[cols_to_show].copy()
         top_rated['Rating'] = top_rated['Rating'].round(1)
         
         fig = px.bar(
             top_rated,
             x='Rating',
             y='Title',
-            color='Primary_Genre',
+            color=genre_col if genre_col in top_rated.columns else None,
             orientation='h',
             title='Top 20 phim có rating cao nhất',
             labels={'Rating': 'IMDb Rating', 'Title': ''},
@@ -464,9 +471,9 @@ with tabs[5]:
         """)
     
     # Insight 2: Genre Analysis
-    if 'Primary_Genre' in df.columns:
-        top_genre = df['Primary_Genre'].value_counts().index[0]
-        top_genre_count = df['Primary_Genre'].value_counts().values[0]
+    if genre_col and genre_col in df.columns:
+        top_genre = df[genre_col].value_counts().index[0]
+        top_genre_count = df[genre_col].value_counts().values[0]
         
         st.markdown(f"""
         ### 2. 🎭 Thể Loại Phổ Biến
