@@ -62,7 +62,7 @@ st.markdown("""
 
 # ==================== LOAD DỮ LIỆU ====================
 
-@st.cache_data
+@st.cache_data(ttl=600)  # Cache 10 phút
 def load_data():
     """Load dữ liệu đã xử lý"""
     data_path = 'data/processed_movies.csv'
@@ -77,6 +77,12 @@ def load_data():
     else:
         st.error("❌ Không tìm thấy file dữ liệu! Vui lòng chạy data_collection.py và data_preprocessing.py trước.")
         st.stop()
+
+# Button để clear cache (ẩn trong sidebar)
+with st.sidebar:
+    if st.button("🔄 Reload Data", help="Click để tải lại dữ liệu mới nhất"):
+        st.cache_data.clear()
+        st.rerun()
 
 df = load_data()
 
