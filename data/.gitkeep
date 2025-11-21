@@ -1,0 +1,7 @@
+# Thư mục dữ liệu
+
+Thư mục này chứa các file dữ liệu:
+- `raw_movies.csv` - Dữ liệu thô từ API/dataset mẫu
+- `processed_movies.csv` - Dữ liệu đã xử lý
+
+Các file này sẽ được tạo tự động khi chạy scripts.

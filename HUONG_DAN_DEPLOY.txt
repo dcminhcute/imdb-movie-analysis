@@ -1,0 +1,91 @@
+# 🚀 HƯỚNG DẪN DEPLOY LÊN STREAMLIT CLOUD
+# Thời gian: ~10 phút
+
+## BƯỚC 1: TẠO GITHUB REPOSITORY (2 phút)
+
+1. Mở trình duyệt và truy cập: https://github.com/new
+
+2. Điền thông tin:
+   - Repository name: imdb-movie-analysis
+   - Description: IMDb Movie Data Analysis - Đoàn Quang Minh B22DCVT336
+   - Chọn: ✅ Public
+   - ❌ KHÔNG tích vào "Add a README file"
+
+3. Click nút "Create repository"
+
+4. Copy URL repository (dạng: https://github.com/YOUR_USERNAME/imdb-movie-analysis.git)
+
+## BƯỚC 2: UPLOAD CODE LÊN GITHUB (3 phút)
+
+Mở PowerShell trong thư mục project và chạy lần lượt:
+
+```powershell
+# 1. Thêm tất cả file
+git add .
+
+# 2. Commit
+git commit -m "Initial commit - IMDb Movie Analysis with 1000 movies"
+
+# 3. Đổi tên branch
+git branch -M main
+
+# 4. Thêm remote (THAY YOUR_USERNAME bằng username GitHub của bạn)
+git remote add origin https://github.com/YOUR_USERNAME/imdb-movie-analysis.git
+
+# 5. Push lên GitHub
+git push -u origin main
+```
+
+📝 **Lưu ý:** 
+- Nếu lần đầu push, GitHub sẽ yêu cầu đăng nhập
+- Nhập username và password (hoặc Personal Access Token)
+
+## BƯỚC 3: DEPLOY LÊN STREAMLIT CLOUD (5 phút)
+
+1. Truy cập: https://share.streamlit.io/
+
+2. Click "Sign in with GitHub"
+
+3. Đăng nhập GitHub và cho phép truy cập
+
+4. Click nút "New app" (hoặc "Create app")
+
+5. Điền thông tin:
+   - Repository: YOUR_USERNAME/imdb-movie-analysis
+   - Branch: main
+   - Main file path: app.py
+
+6. Click "Deploy!"
+
+7. Đợi 2-3 phút để Streamlit build và deploy
+
+## ✅ HOÀN THÀNH!
+
+Bạn sẽ nhận được link dạng:
+```
+https://YOUR_USERNAME-imdb-movie-analysis-app-xxxxx.streamlit.app
+```
+
+🎯 **Link này có thể gửi cho giảng viên!**
+
+## 🔧 NẾU GẶP LỖI
+
+### Lỗi: "requirements.txt not found"
+✅ Kiểm tra file requirements.txt có trong repository
+
+### Lỗi: "FileNotFoundError: data/processed_movies.csv"
+✅ Đảm bảo file data/processed_movies.csv đã được commit
+
+### Lỗi: "Module not found"
+✅ Kiểm tra requirements.txt có đầy đủ thư viện
+
+## 📧 HỖ TRỢ
+
+Nếu cần hỗ trợ:
+1. Kiểm tra logs trên Streamlit Cloud
+2. Xem file DEPLOYMENT.md
+3. Liên hệ qua GitHub Issues
+
+---
+
+💡 **Mẹo:** App sẽ tự động cập nhật khi bạn push code mới lên GitHub!

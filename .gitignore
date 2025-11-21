@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyc
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Data files
+*.csv
+*.json
+*.xlsx
+*.xls
+!.gitkeep
+
+# Environment variables
+.env
+
+# Streamlit
+.streamlit/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+!screenshots/*.png
+
+# Visualizations (optional - nếu muốn commit thì bỏ dòng này)
+visualizations/
