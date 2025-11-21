@@ -11,7 +11,7 @@ git commit -m "Initial commit - IMDb Movie Analysis with 1000 movies"
 git branch -M main
 
 # Bước 4: Thêm remote GitHub (⚠️ SỬA YOUR_USERNAME)
-git remote add origin https://github.com/YOUR_USERNAME/imdb-movie-analysis.git
+git remote add origin https://github.com/dcminhcute/imdb-movie-analysis.git
 
 # Bước 5: Push lên GitHub
 git push -u origin main
