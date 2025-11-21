@@ -17,34 +17,68 @@ def download_imdb_dataset():
     
     # Danh sách các URL dataset công khai (thử lần lượt)
     urls = [
+        # Dataset mới nhất có phim đến 2024
+        "https://raw.githubusercontent.com/danielgrijalva/movie-stats/master/movies.csv",
+        # Dataset dự phòng
         "https://raw.githubusercontent.com/LearnDataSci/articles/master/Python%20Pandas%20Tutorial%20A%20Complete%20Introduction%20for%20Beginners/IMDB-Movie-Data.csv",
-        "https://gist.githubusercontent.com/tiangechen/b68782efa49a16edaf07dc2cdaa855ea/raw/0c794a9717f18b094eabab2cd6a6b9a226903577/movies.csv",
     ]
     
-    url = urls[0]  # Thử URL đầu tiên
+    # Thử từng URL cho đến khi thành công
+    df = None
+    for url in urls:
+        print(f"🔄 Đang thử: {url}")
+        url = url  # Gán URL hiện tại
+    
+    # Thử tải từng URL
+    for idx, url in enumerate(urls, 1):
+        try:
+            print(f"\n🔄 [{idx}/{len(urls)}] Đang thử tải từ URL...")
+            print("⏳ Đang tải... (có thể mất vài giây)")
+            df = pd.read_csv(url)
+            
+            print(f"✅ Đã tải thành công {len(df)} phim!")
+            
+            # Hiển thị thông tin
+            print(f"\n📊 Thông tin dataset:")
+            print(f"   - Số lượng phim: {len(df)}")
+            print(f"   - Số cột: {len(df.columns)}")
+            print(f"   - Các cột: {', '.join(df.columns.tolist())}")
+            break  # Thành công thì thoát vòng lặp
+            
+        except Exception as e:
+            print(f"❌ Lỗi với URL {idx}: {e}")
+            if idx < len(urls):
+                print("🔄 Thử URL tiếp theo...")
+            continue
+    
+    if df is None:
+        raise Exception("Không thể tải dataset từ bất kỳ URL nào")
     
     try:
-        # Tải dữ liệu
-        print("⏳ Đang tải... (có thể mất vài giây)")
-        df = pd.read_csv(url)
-        
-        print(f"✅ Đã tải thành công {len(df)} phim!")
-        
-        # Hiển thị thông tin
-        print(f"\n📊 Thông tin dataset:")
-        print(f"   - Số lượng phim: {len(df)}")
-        print(f"   - Số cột: {len(df.columns)}")
-        print(f"   - Các cột: {', '.join(df.columns.tolist())}")
         
         # Chuẩn hóa tên cột để phù hợp với code hiện tại
         column_mapping = {
+            # Mapping cho dataset mới
+            'name': 'Title',
+            'year': 'Year',
+            'score': 'Rating',
+            'votes': 'imdbVotes',
+            'gross': 'BoxOffice',
+            'runtime': 'Runtime',
+            'country': 'Country',
+            'company': 'Production',
+            'director': 'Director',
+            'writer': 'Writer',
+            'star': 'Actors',
+            # Mapping cho dataset cũ
             'Series_Title': 'Title',
             'Released_Year': 'Year',
             'IMDB_Rating': 'Rating',
             'Overview': 'Plot',
             'Meta_score': 'Metascore',
             'No_of_Votes': 'imdbVotes',
-            'Gross': 'BoxOffice'
+            'Gross': 'BoxOffice',
+            'Runtime (Minutes)': 'Runtime'
         }
         
         # Đổi tên cột nếu tồn tại
@@ -60,6 +94,13 @@ def download_imdb_dataset():
         df.to_csv(output_path, index=False, encoding='utf-8-sig')
         
         print(f"\n💾 Đã lưu tại: {output_path}")
+        # Kiểm tra năm phim
+        if 'Year' in df.columns:
+            df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
+            year_min = df['Year'].min()
+            year_max = df['Year'].max()
+            print(f"   - Khoảng năm: {year_min:.0f} - {year_max:.0f}")
+        
         print(f"\n🎯 Bước tiếp theo:")
         print(f"   1. Chạy: python data_preprocessing.py")
         print(f"   2. Chạy: python data_analysis.py")
@@ -68,7 +109,7 @@ def download_imdb_dataset():
         return df
         
     except Exception as e:
-        print(f"\n❌ Lỗi khi tải dataset: {e}")
+        print(f"\n❌ Lỗi khi xử lý dataset: {e}")
         print(f"\n💡 Giải pháp thay thế:")
         print(f"   1. Kiểm tra kết nối internet")
         print(f"   2. Hoặc tải thủ công từ:")
